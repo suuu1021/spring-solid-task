@@ -1,0 +1,9 @@
+POST http://localhost:8080/api/issues
+Content-Type: application/json
+
+{
+    "title": "HTTP Client test",
+    "description": "api test",
+    "projectId": 1,
+    "reporterId": 1
+}

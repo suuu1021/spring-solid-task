@@ -1,10 +1,15 @@
 package com.puzzlix.solid_task.domain.issue;
 
+import com.puzzlix.solid_task.domain.comment.Comment;
+import com.puzzlix.solid_task.domain.project.Project;
+import com.puzzlix.solid_task.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,9 +30,18 @@ public class Issue {
 
     // 추후 연관관계 필드
     // 프로젝트 pk
-    private Long projectId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
+    private Project project;
     // 보고자 (누가 요청 했는지)
-    private Long reporterId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reporter_id")
+    private User reporter;
     // 담당자
-    private Long assigneeId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assignee_id")
+    private User assignee;
+
+    @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL)
+    private List<Comment> comment;
 }

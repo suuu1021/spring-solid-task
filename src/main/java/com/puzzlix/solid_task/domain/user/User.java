@@ -1,7 +1,12 @@
 package com.puzzlix.solid_task.domain.user;
 
+import com.puzzlix.solid_task.domain.comment.Comment;
+import com.puzzlix.solid_task.domain.issue.Issue;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,4 +23,8 @@ public class User {
     private String name;
     private String email;
     private String password;
+
+    @OneToMany(mappedBy = "reporter")
+    private List<Issue> issues = new ArrayList<>();
+
 }

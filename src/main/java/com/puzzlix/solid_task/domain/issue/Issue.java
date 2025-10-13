@@ -4,10 +4,7 @@ import com.puzzlix.solid_task.domain.comment.Comment;
 import com.puzzlix.solid_task.domain.project.Project;
 import com.puzzlix.solid_task.domain.user.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -16,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@ToString(exclude = {"project", "reporter", "assignee", "comment"})
 public class Issue {
     // pk, 타이틀, 내용, 진행 상태
 

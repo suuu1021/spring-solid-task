@@ -1,6 +1,5 @@
 package com.puzzlix.solid_task.domain.user;
 
-import com.puzzlix.solid_task.domain.comment.Comment;
 import com.puzzlix.solid_task.domain.issue.Issue;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "user_table")
-@ToString
+@ToString(exclude = {"issues"})
 public class User {
 
     @Id

@@ -1,6 +1,8 @@
 package com.puzzlix.solid_task.domain.user;
 
 import com.puzzlix.solid_task.domain.user.dto.UserRequest;
+import com.puzzlix.solid_task.domain.user.login.LoginStrategy;
+import com.puzzlix.solid_task.domain.user.login.LoginStrategyFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ public class UserService {
     private final UserRepository userRepository;
     // AppConfig 에 Bean 으로 등록된 객체를 가져 온다
     private final PasswordEncoder passwordEncoder;
+    private final LoginStrategyFactory loginStrategyFactory;
 
     /**
      * 회원가입
@@ -45,15 +48,11 @@ public class UserService {
      * 2. 암호화된 비밀번호와 사용자가 입력한 비밀번호 비교
      */
     @Transactional(readOnly = true)
-    public User login(UserRequest.Login request) {
-        // 이메일 사용자 조회
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 이메일 입니다"));
+    public User login(String type, UserRequest.Login request) {
+        // 1. 팩토리에게 알맞은 로그인 전략 요청
+        LoginStrategy strategy = loginStrategyFactory.findStrategy(type);
 
-        // 비밀번호 비교
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("잘못된 비밀번호 입니다");
-        }
-        return user;
+        // 2. 해당 전략 클래스를 선택하여 로그인 요청 완료
+        return strategy.login(request);
     }
 }

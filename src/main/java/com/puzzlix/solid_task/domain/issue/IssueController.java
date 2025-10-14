@@ -18,6 +18,17 @@ public class IssueController {
     private final IssueService issueService;
 
     /**
+     * 이슈 수정 API
+     * PUT /api/issues/{id}
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<CommonResponseDto<IssueResponse.FindById>> updateIssue(
+            @PathVariable(name = "id") Long id, @RequestBody IssueRequest.Update request) {
+        Issue issue = issueService.updateIssue(id, request);
+        return ResponseEntity.ok(CommonResponseDto.success(new IssueResponse.FindById(issue), "이슈가 성공적으로 수정 되었습니다"));
+    }
+
+    /**
      * 이슈 생성 API
      * POST /api/issues
      */

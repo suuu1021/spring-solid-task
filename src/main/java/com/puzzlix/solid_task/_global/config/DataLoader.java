@@ -5,6 +5,7 @@ import com.puzzlix.solid_task.domain.issue.IssueRepository;
 import com.puzzlix.solid_task.domain.issue.IssueStatus;
 import com.puzzlix.solid_task.domain.project.Project;
 import com.puzzlix.solid_task.domain.project.ProjectRepository;
+import com.puzzlix.solid_task.domain.user.Role;
 import com.puzzlix.solid_task.domain.user.User;
 import com.puzzlix.solid_task.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +33,11 @@ public class DataLoader implements CommandLineRunner {
         // 샘플 데이터 추가
         // 유저 2개, 프로젝트 1개
         User testUser1 = userRepository.save(
-                new User(null, "가나디", "test1@naver.com", passwordEncoder.encode("1234"),new ArrayList<>()));
+                new User(null, "가나디", "test1@naver.com", passwordEncoder.encode("1234"), Role.USER, new ArrayList<>()));
         User testUser2 = userRepository.save(
-                new User(null, "밍밍이", "test2@naver.com", passwordEncoder.encode("1234"),new ArrayList<>()));
+                new User(null, "밍밍이", "test2@naver.com", passwordEncoder.encode("1234"),Role.USER, new ArrayList<>()));
+        User testUser3 = userRepository.save(
+                new User(null, "관리자", "test3@naver.com", passwordEncoder.encode("1234"),Role.ADMIN, new ArrayList<>()));
 
         Project testProject = projectRepository.save(
                 new Project(null, "solid task 프로젝트", "프로젝트 입니다",new ArrayList<>()));

@@ -1,14 +1,20 @@
 package com.puzzlix.solid_task.domain.issue;
 
+import com.puzzlix.solid_task._global.dto.CommonResponseDto;
 import com.puzzlix.solid_task.domain.issue.dto.IssueRequest;
+import com.puzzlix.solid_task.domain.issue.dto.IssueResponse;
 import com.puzzlix.solid_task.domain.project.Project;
 import com.puzzlix.solid_task.domain.project.ProjectRepository;
+import com.puzzlix.solid_task.domain.user.Role;
 import com.puzzlix.solid_task.domain.user.User;
 import com.puzzlix.solid_task.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.sql.rowset.serial.SerialException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -21,16 +27,42 @@ public class IssueService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
 
+    public Issue updateIssueStatus(Long issueId, IssueStatus status, String requestUserEmail, Role userRole) {
+        // 인가 처리
+        Issue issue = issueRepository.findById(issueId)
+                .orElseThrow(() -> new NoSuchElementException("해당 ID의 이슈를 찾을 수 없습니다"));
+
+        // 관리자가 아니거나 담당자가 아니면 상태를 변경 못함
+        if (userRole != Role.ADMIN && issue.getAssignee().getEmail().equals(requestUserEmail)) {
+            throw new SecurityException("이슈 상태를 변경할 권한이 없습니다");
+        }
+        // 더티체킹 사용
+        issue.setIssueStatus(status);
+        return issue;
+    }
+
+
     /**
      * JPA 사용 (수정 전략) --> 더티 체킹
      * JPA 변경 감지(Dirty Checking) 덕분에 save() 명시적으로 호출하지 않아도
-     *  트랜잭션이 끝날 때 변경된 내용이 DB에 자등으로 반영 된다.
+     * 트랜잭션이 끝날 때 변경된 내용이 DB에 자등으로 반영 된다.
      */
     // 이슈 수정
-    public Issue updateIssue(Long issueId, IssueRequest.Update request) {
+    public Issue updateIssue(Long issueId, IssueRequest.Update request, String requestUserEmail) {
+
+        User requestUser = userRepository.findByEmail(requestUserEmail)
+                .orElseThrow(() -> new NoSuchElementException("요청한 사용자를 찾을 수 없습니다"));
+
         Issue issue = issueRepository.findById(issueId)
                 .orElseThrow(() -> new NoSuchElementException("해당 ID의 이슈를 찾을 수 없습니다"));
-        // 넘어온 값이 담당자 할당 여부에 따로 분기 처리 되어야 함
+
+        // 인가 처리 -> 관리자라면 수정 가능하게 변경
+        boolean isAdmin = requestUser.getRole() == Role.ADMIN;
+        boolean isReporter = requestUser.getId().equals(issue.getReporter().getId());
+        if (!isAdmin && !isReporter) {
+            throw new SecurityException("이슈를 수정할 권한이 없습니다");
+        }
+
         if (request.getAssigneeId() != null) {
             User assignee = userRepository.findById(request.getAssigneeId())
                     .orElseThrow(() -> new NoSuchElementException("해당 ID의 담당자를 찾을 수 없습니다"));
@@ -46,11 +78,16 @@ public class IssueService {
     }
 
     // 이슈 삭제
-    public void deleteIssue (Long issueId) {
-        if (!issueRepository.existsById(issueId)) {
-            throw new NoSuchElementException("해당 ID의 이슈를 찾을 수 없습니다");
+    public void deleteIssue(Long issueId, String requestUserEmail, Role userRole) {
+
+        Issue issue = issueRepository.findById(issueId)
+                .orElseThrow(() -> new NoSuchElementException("해당 ID의 이슈를 찾을 수 없습니다"));
+
+        if (userRole != Role.ADMIN && !issue.getReporter().getEmail().equals(requestUserEmail)) {
+            throw new SecurityException("이슈를 삭제할 권한이 없습니다");
         }
         issueRepository.deleteById(issueId);
+        // requestUserEmail 이력 관리(누가 삭제했는지 관리 기능)
     }
 
     // 이슈 생성 로직

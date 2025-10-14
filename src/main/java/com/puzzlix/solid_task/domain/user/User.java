@@ -2,6 +2,7 @@ package com.puzzlix.solid_task.domain.user;
 
 import com.puzzlix.solid_task.domain.issue.Issue;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -22,6 +23,10 @@ public class User {
     private String name;
     private String email;
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
     @OneToMany(mappedBy = "reporter")
     private List<Issue> issues = new ArrayList<>();

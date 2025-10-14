@@ -3,6 +3,7 @@ package com.puzzlix.solid_task.domain.issue;
 import com.puzzlix.solid_task._global.dto.CommonResponseDto;
 import com.puzzlix.solid_task.domain.issue.dto.IssueRequest;
 import com.puzzlix.solid_task.domain.issue.dto.IssueResponse;
+import com.puzzlix.solid_task.domain.user.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,13 +19,38 @@ public class IssueController {
     private final IssueService issueService;
 
     /**
+     * 이슈 삭제 API
+     * DELETE /api/issues/{id}
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteIssue(
+            @PathVariable(name = "id") Long id,
+            @RequestAttribute("userEmail") String userEmail, @RequestAttribute("userRole") Role userRole) {
+        issueService.deleteIssue(id, userEmail, userRole);
+        return ResponseEntity.ok(CommonResponseDto.success(null, "이슈가 성공적으로 삭제 되었습니다"));
+    }
+
+    /**
+     * 특정 이슈 상태 변경 API (담당자, 관리자가 진행 상태 변경)
+     * 주소 설계 - http://localhost:8080/api/issues/{id}/status
+     */
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<?> updateIssueStatus(
+            @PathVariable(name = "id") Long issueId, @RequestParam("status") IssueStatus newStatus,
+            @RequestAttribute("userEmail") String userEmail, @RequestAttribute("userRole") Role userRole) {
+        Issue issue = issueService.updateIssueStatus(issueId, newStatus, userEmail, userRole);
+        return ResponseEntity.ok(CommonResponseDto.success(issue, "이슈 상태가 성공적으로 변경 되었습니다"));
+    }
+
+    /**
      * 이슈 수정 API
      * PUT /api/issues/{id}
      */
     @PutMapping("/{id}")
     public ResponseEntity<CommonResponseDto<IssueResponse.FindById>> updateIssue(
-            @PathVariable(name = "id") Long id, @RequestBody IssueRequest.Update request) {
-        Issue issue = issueService.updateIssue(id, request);
+            @PathVariable(name = "id") Long id, @RequestBody IssueRequest.Update request,
+            @RequestAttribute("userEmail") String userEmail) {
+        Issue issue = issueService.updateIssue(id, request, userEmail);
         return ResponseEntity.ok(CommonResponseDto.success(new IssueResponse.FindById(issue), "이슈가 성공적으로 수정 되었습니다"));
     }
 

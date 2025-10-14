@@ -1,5 +1,6 @@
 package com.puzzlix.solid_task._global.config.jwt;
 
+import com.puzzlix.solid_task.domain.user.Role;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,12 @@ public class JwtInterceptor implements HandlerInterceptor {
         String token = resolveToken(request);
         if (token != null && jwtTokenProvider.validateToken(token)) {
             // 결과 값이 true 라면 controller 로 보낸다
+
+            // 이메일 정보, role
+            String userEmail = jwtTokenProvider.getSubject(token);
+            Role userRole = jwtTokenProvider.getRole(token);
+            request.setAttribute("userEmail", userEmail);
+            request.setAttribute("userRole", userRole);
             return true;
         }
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않은 토큰 입니다");

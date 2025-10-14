@@ -1,20 +1,15 @@
 package com.puzzlix.solid_task.domain.issue;
 
-import com.puzzlix.solid_task._global.dto.CommonResponseDto;
 import com.puzzlix.solid_task.domain.issue.dto.IssueRequest;
-import com.puzzlix.solid_task.domain.issue.dto.IssueResponse;
 import com.puzzlix.solid_task.domain.project.Project;
 import com.puzzlix.solid_task.domain.project.ProjectRepository;
 import com.puzzlix.solid_task.domain.user.Role;
 import com.puzzlix.solid_task.domain.user.User;
 import com.puzzlix.solid_task.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.sql.rowset.serial.SerialException;
 import java.util.List;
 import java.util.NoSuchElementException;
 

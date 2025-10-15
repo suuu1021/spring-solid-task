@@ -27,6 +27,7 @@ spring:
   jpa:
     # JPA의 구현체인 Hibernate에 대한 설정
     hibernate:
+
       # ddl-auto: 애플리케이션 실행 시점에 DB 스키마(테이블 등)를 어떻게 처리할지 결정
       # create-drop: 실행 시점에 엔티티 기준으로 테이블을 생성하고, 종료 시점에 모두 삭제합니다. (개발용으로 편리함)
       ddl-auto: create-drop
@@ -39,7 +40,11 @@ spring:
     show-sql: true # 실행되는 SQL 쿼리를 콘솔에 출력
     open-in-view: true
 
-
 jwt:
   secret: 'VGhpc0lzQVNlY3JldEtleUZvckpXVFNhZmUhIT8xMjM0NTY='
   expiration-in-ms: 3600000 # 1시간
+
+notification:
+  policy:
+    # 이슈 상태가 DONE 으로 변경되었을 때 사용할 알림 타입 지정
+    on-status-done: SMS
